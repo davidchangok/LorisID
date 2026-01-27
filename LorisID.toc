@@ -6,13 +6,15 @@
 ## Notes-zhCN: 高级鼠标提示增强。完全适配 12.0 至暗之夜 API。
 ## Notes-zhTW: 進階滑鼠提示增強。完全適配 12.0 至暗之夜 API。
 ## Author: David W Zhang
-## Version: 3.2.2
+## Version: 2.0.0
 ## SavedVariables: LorisIDDB
 ## IconAtlas: UI-HUD-MainMenuBar-Icon-AdventureGuide
 ## Category: UI Customization
 ## Group: LorisID_Suite
 ## X-Category: Tooltip
 ## X-License: MIT
+## X-Website: https://www.curseforge.com/wow/addons/lorisid
+## X-Curse-Project-ID: 1445941
 
 # ---------------------------------------------------------
 # 1. 核心层: 本地化与基础定义
