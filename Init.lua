@@ -37,7 +37,7 @@ ns.ExpansionNames = {
     [12] = "The Last Titan",
 }
 
--- = : 修复意外符号错误，确保所有 Key 均为字符串占位)
+-- 初始化数据库配置，确保所有配置项都有默认值
 function ns:InitializeDB()
     -- 直接使用 .toc 中定义的 SavedVariables: LorisIDDB
     -- 如果是首次加载，LorisIDDB 会是 nil，我们需要将其初始化为一个空表

@@ -105,9 +105,9 @@ function Cache:EvictLRU(cacheType)
     if not bucket then return end
 
     local oldestKey = nil
-    local oldestTime = GetTime()
+    local oldestTime = math.huge  -- 使用 math.huge 代替 GetTime()
     
-    -- 扫描寻找最久未被调用的缓存项
+    -- 单次遍历找到最久未访问的项
     for k, entry in pairs(bucket) do
         if entry.lastAccess < oldestTime then
             oldestTime = entry.lastAccess

@@ -39,13 +39,15 @@ local TooltipDataTypeMap = {
 -- [[100% 还原]: 查重算法，防止 12.0 数据更新时行数翻倍]
 function IDDisplay:HasLine(tooltip, text)
     if not tooltip or not text then return false end
-    local numLines = tooltip:NumLines()
-    for i = 1, numLines do
-        -- 修正：获取正确的行文本对象 (e.g., GameTooltipTextLeft1)
-        local line = _G[tooltip:GetName() .. "TextLeft" .. i]
-        local lineText = line and line:IsShown() and line:GetText()
-        if lineText and Security:IsSafe(lineText) and lineText == text then
-            return true
+    
+    -- [修复]: 弃用 _G[name.."TextLeft"..i] 旧架构，改用 Region 迭代
+    -- 这是 12.0 兼容性最强的方法，支持所有类型的 Tooltip 框架
+    for _, region in ipairs({tooltip:GetRegions()}) do
+        if region and region:IsObjectType("FontString") then
+            local lineText = region:GetText()
+            if lineText and Security:IsSafe(lineText) and lineText == text then
+                return true
+            end
         end
     end
     return false

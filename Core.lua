@@ -39,7 +39,7 @@ SlashCmdList["LORISID"] = function(msg)
     elseif cmd == "cache" then
         -- 调用文件 5 定义的 LRU 清理逻辑
         ns.Cache:Clear(arg)
-        print(("|cFF%s[%s]|r: %s"):format(ns.Colors.Header.hex:sub(3), ns.Name, L["clear data cache"]))
+        print(("|cFF%s[%s]|r: %s"):format(ns.Colors.Header.hex:sub(3), ns.Name, L["Cmd_Cache"]))
         
     elseif cmd == "debug" then
         -- 切换 12.0 性能审计模式
@@ -96,20 +96,19 @@ Core:RegisterEvent("QUEST_DATA_LOAD_RESULT")
 
 Core:SetScript("OnEvent", function(self, event,...)
     if event == "PLAYER_LOGIN" then
-        -- 1. 确保数据库已初始化 (Init.lua 兜底)
-        if not ns.DB then ns:InitializeDB() end
-
-        -- 5. 12.0 午夜版：启动日志 (移至此处以确保 ns.DB 可用)
+        -- 启动日志 (数据库已在 ADDON_LOADED 事件中初始化)
         if ns.DB and ns.DB.debugMode then
             print(("|cFF%s[%s]|r: %s"):format(ns.Colors.Header.hex:sub(3), ns.Name, L["Engine Started"]))
         end
         
-        -- 2. 启动 12.0 实时性能预警
+        -- 启动 12.0 实时性能监控
         C_Timer.NewTicker(5, function()
-            if ns.DB.debugMode then
+            if ns.DB and ns.DB.debugMode then
                 local cpu = ns:GetAddOnCPUUsage()
-                if cpu > ns.DB.perfThreshold then
-                    print(("|cFF%s[%s]|r %s (%.2fms)"):format(ns.Colors.Error.hex:sub(3), ns.Name, L["PerfAlert"], cpu))
+                if cpu and cpu > (ns.DB.perfThreshold or 10) then
+                    print(("|cFF%s[%s]|r %s (%.2fms)"):format(
+                        ns.Colors.Error.hex:sub(3), ns.Name, L["PerfAlert"], cpu
+                    ))
                 end
             end
         end)

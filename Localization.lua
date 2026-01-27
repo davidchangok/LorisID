@@ -18,11 +18,12 @@ local locale = GetLocale()
 -- 2. 默认语言: 英文 (enUS / enGB)
 -- =========================================================
 -- [修复点]: 严禁 L = "String" 赋值。必须使用索引。
-L["AddonName"] = "LorisID"
+L["AddonName"] = "LorisID |cFF00FF00[Midnight]|r"
 L["Init_Loaded"] = "LorisID initialized. Midnight 12.0 API ready."
 L["Settings"] = "|cff00ff00Loris|r|cffffd700ID|r Settings"
 
 -- 设置面板 (Settings Panel)
+L["Control"] = "Control"
 L["EnableModule"] = "Enable Module"
 L["Debug Mode"] = "Debug Mode"
 L["ID Display Settings"] = "ID Display Settings"
@@ -99,6 +100,7 @@ if locale == "zhCN" then
     L["Init_Loaded"] = "LorisID 已加载。至暗之夜 12.0 API 已就绪。"
     L["Settings"] = "|cff00ff00Loris|r|cffffd700ID|r 插件设置"
 
+    L["Control"] = "控制"
     L["EnableModule"] = "启用模块"
     L["Debug Mode"] = "调试模式"
     L["ID Display Settings"] = "ID 显示设置"
@@ -167,10 +169,11 @@ end
 -- 4. 繁体中文: zhTW (还原 David W Zhang 原版翻译)
 -- =========================================================
 if locale == "zhTW" then
-    L["AddonName"] = "LorisID |cFF00FF00[至暗之夜版]|r"
+    L["AddonName"] = "LorisID |cFF00FF00[至暗之夜]|r"
     L["Init_Loaded"] = "LorisID 已加載。至暗之夜 12.0 API 已就緒。"
     L["Settings"] = "|cff00ff00Loris|r|cffffd700ID|r 插件設置"
 
+    L["Control"] = "控制"
     L["EnableModule"] = "啟用模組"
     L["Debug Mode"] = "除錯模式"
     L["ID Display Settings"] = "ID 顯示設置"

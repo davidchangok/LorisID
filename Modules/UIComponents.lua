@@ -18,45 +18,65 @@ local CreateAtlasMarkup = _G.CreateAtlasMarkup
 -- @param owner: 触发菜单的 Region
 function UIComponents:ShowMainMenu(owner)
     if not owner or not MenuUtil then return end
+    
+    -- 确保核心数据已初始化
+    if not ns.DB or not ns.Cache or not ns.L then
+        print("|cFFFF0000[LorisID]|r Core data not initialized. Cannot show menu.")
+        return
+    end
 
     -- 12.0 生成器逻辑：通过闭包构建菜单描述，确保跨版本抗污染
     local function Generator(owner, rootDescription)
-        rootDescription:CreateTitle(("|cFF%s%s|r"):format(ns.Colors.Header.hex:sub(3), ns.Name))
-        
-        -- 1. 全局开关 (还原原插件 Checkbox 交互)
-        rootDescription:CreateCheckbox(
-            ns.L["EnableModule"], 
-            function() return ns.DB.enabled end, 
-            function() 
-                ns.DB.enabled = not ns.DB.enabled
-                if ns.DB.debugMode then print(ns.Name.. ": 状态变更为", ns.DB.enabled) end
-            end
-        )
-        
-        rootDescription:CreateDivider()
+        -- 使用 pcall 保护菜单生成，防止插件冲突
+        local success, err = pcall(function()
+            rootDescription:CreateTitle(("|cFF%s%s|r"):format(ns.Colors.Header.hex:sub(3), ns.Name))
+            
+            -- 1. 全局开关 (还原原插件 Checkbox 交互)
+            rootDescription:CreateCheckbox(
+                ns.L["EnableModule"], 
+                function() return ns.DB.enabled end, 
+                function() 
+                    ns.DB.enabled = not ns.DB.enabled
+                    if ns.DB.debugMode then 
+                        print(ns.Name.. ": Status changed to", ns.DB.enabled) 
+                    end
+                end
+            )
+            
+            rootDescription:CreateDivider()
 
-        -- 2. 缓存管理子菜单 (还原原插件 Cache 功能)
-        local cacheMenu = rootDescription:CreateButton(ns.L["Performance & Cache"]) -- 修正：使用正确的键名
-        cacheMenu:CreateButton(ns.L["Item"], function() ns.Cache:Clear("item") end)
-        cacheMenu:CreateButton(ns.L["Spell"], function() ns.Cache:Clear("spell") end)
-        cacheMenu:CreateButton(ns.L["Clear All"], function() ns.Cache:Clear() end) -- 修正：硬编码中文
+            -- 2. 缓存管理子菜单 (还原原插件 Cache 功能)
+            local cacheMenu = rootDescription:CreateButton(ns.L["Performance & Cache"])
+            cacheMenu:CreateButton(ns.L["Item"], function() 
+                if ns.Cache then ns.Cache:Clear("item") end 
+            end)
+            cacheMenu:CreateButton(ns.L["Spell"], function() 
+                if ns.Cache then ns.Cache:Clear("spell") end 
+            end)
+            cacheMenu:CreateButton(ns.L["Clear All"], function() 
+                if ns.Cache then ns.Cache:Clear() end 
+            end)
 
-        -- 3. 调试模式切换
-        rootDescription:CreateCheckbox(
-            ns.L["Debug Mode"], 
-            function() return ns.DB.debugMode end, 
-            function() ns.DB.debugMode = not ns.DB.debugMode end
-        )
+            -- 3. 调试模式切换
+            rootDescription:CreateCheckbox(
+                ns.L["Debug Mode"], 
+                function() return ns.DB.debugMode end, 
+                function() ns.DB.debugMode = not ns.DB.debugMode end
+            )
 
-        rootDescription:CreateDivider()
+            rootDescription:CreateDivider()
 
-        -- 4. 打开设置面板 (12.0 Settings API 连接)
-        rootDescription:CreateButton(ns.L["Cmd_Config"], function() -- 修正：使用正确的键名
-            -- 12.0 推荐的设置面板开启方式
-            if ns.ConfigCategoryID then
-                Settings.OpenToCategory(ns.ConfigCategoryID)
-            end
+            -- 4. 打开设置面板 (12.0 Settings API 连接)
+            rootDescription:CreateButton(ns.L["Cmd_Config"], function()
+                if ns.ConfigCategoryID then
+                    Settings.OpenToCategory(ns.ConfigCategoryID)
+                end
+            end)
         end)
+        
+        if not success then
+            print("|cFFFF0000[LorisID]|r Menu generation error:", err)
+        end
     end
 
     -- 12.0 最佳实践：立即在鼠标位置弹出

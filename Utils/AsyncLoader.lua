@@ -45,9 +45,9 @@ function AsyncLoader:LoadItem(itemID, callback)
                 quality     = info[3],
                 level       = info[4],
                 icon        = info[10], -- 标准 API 图标位于第 10 位
-                bindType    = info[7],
-                description = info[9], -- 对齐 ItemQuery.lua 定义 (第9位)
-                expansionID = info[8], -- 对齐 ItemQuery.lua 定义 (第8位)
+                bindType    = info[14], -- [修正] 标准 API: BindType 位于第 14 位
+                description = nil,      -- [修正] 标准 API: 第 9 位是 EquipLoc，非描述。暂置空以防乱码。
+                expansionID = info[15], -- [修正] 标准 API: ExpacID 位于第 15 位
             }
             
             -- 存入 LRU 缓存并执行回调
@@ -95,7 +95,7 @@ end
 -- 4. 核心：任务数据异步请求 (12.0 API)
 -- =========================================================
 -- [[100% 还原]: 还原原插件对世界任务及离线任务 ID 的解析能力]
-function AsyncLoader:LoadQuest(questID, callback)
+function AsyncLoader:LoadQuest(questID, callback, retryCount)
     if not questID or questID == 0 then return end
 
     local cached = ns.Cache:Get("quest", questID)
@@ -104,12 +104,16 @@ function AsyncLoader:LoadQuest(questID, callback)
         return
     end
 
+    -- [鲁棒性修复] 增加最大重试次数，防止无效 ID 导致的无限递归死循环
+    retryCount = retryCount or 0
+    if retryCount > 10 then return end -- 超过 10 次 (约2秒) 放弃
+
     -- 12.0 任务异步加载标准流程 
     if not C_QuestLog.IsQuestDataCached(questID) then
         C_QuestLog.RequestLoadQuestByID(questID)
         -- 通过延时重试策略确保在数据同步后触发回调
         C_Timer.After(0.2, function()
-            self:LoadQuest(questID, callback)
+            self:LoadQuest(questID, callback, retryCount + 1)
         end)
         return
     end

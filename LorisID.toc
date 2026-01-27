@@ -6,7 +6,7 @@
 ## Notes-zhCN: 高级鼠标提示增强。完全适配 12.0 至暗之夜 API。
 ## Notes-zhTW: 進階滑鼠提示增強。完全適配 12.0 至暗之夜 API。
 ## Author: David W Zhang
-## Version: 3.2.1
+## Version: 3.2.2
 ## SavedVariables: LorisIDDB
 ## IconAtlas: UI-HUD-MainMenuBar-Icon-AdventureGuide
 ## Category: UI Customization

@@ -78,11 +78,11 @@ function ItemQuery:GetMetadata(itemID)
         link        = info[2],
         quality     = info[3],
         iLevel      = info[4],
-        stackSize   = info[5] or 1,
-        sellPrice   = info[6] or 0,
-        bindType    = info[7],
-        expansionID = info[8],
-        description = info[9], -- 12.0 至暗之夜专属字段
+        stackSize   = info[8] or 1, -- [修正] 标准 API: StackCount 位于第 8 位 (第5位是 MinLevel)
+        sellPrice   = info[11] or 0,-- [修正] 标准 API: SellPrice 位于第 11 位 (第6位是 Type)
+        bindType    = info[14],     -- [修正] 标准 API: BindType 位于第 14 位
+        expansionID = info[15],     -- [修正] 标准 API: ExpacID 位于第 15 位
+        description = nil,          -- [修正] 标准 API: 第 9 位是 EquipLoc。暂置空。
     }
 end
 

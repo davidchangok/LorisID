@@ -66,21 +66,23 @@ end
 -- =========================================================
 -- 2. 12.0 安全格式化工具 (修复 Line 80 语法错误)
 -- =========================================================
+-- 缓存警告格式字符串，避免重复生成
+local cachedWarningFormat = nil
+
 -- [[100% 还原]: 将值转换为字符串，如果是秘密值则返回本地化拦截警告]
 function Security:Format(value)
     if self:IsSafe(value) then
         return tostring(value)
     end
     
-    -- [修正点]: 彻底修复了 Line 80 引号未闭合及 stray symbol 问题
-    local colorHex = "ff4c4c" -- 默认错误红
-    if ns.Colors and ns.Colors.Error then
-        colorHex = ns.Colors.Error.hex:sub(3)
+    -- 延迟初始化缓存格式
+    if not cachedWarningFormat then
+        local colorHex = (ns.Colors and ns.Colors.Error and ns.Colors.Error.hex:sub(3)) or "ff4c4c"
+        local warningText = (ns.L and ns.L["SecretValueBlocked"]) or "Action Blocked"
+        cachedWarningFormat = "|cFF".. colorHex.. warningText.. "|r"
     end
     
-    -- 获取 Localization.lua 中的拦截描述
-    local warningText = (ns.L and ns.L["SecretValueBlocked"]) or "Action Blocked"
-    return "|cFF".. colorHex.. warningText.. "|r"
+    return cachedWarningFormat
 end
 
 -- 12.0 沙盒自检：确保底层安全函数已注册

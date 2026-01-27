@@ -15,6 +15,16 @@ local L = ns.L
 -- 2. 核心：单位光环全量扫描引擎
 -- =========================================================
 
+-- 在函数外部创建表池
+local pointsTablePool = {}
+local function GetPointsTable()
+    return table.remove(pointsTablePool) or {}
+end
+local function ReleasePointsTable(t)
+    table.wipe(t)
+    table.insert(pointsTablePool, t)
+end
+
 -- [[100% 还原]: 还原原插件对 Buff/Debuff 的深度扫描逻辑]
 -- @param unit: 单位标识 ("player", "target", "focus" 等)
 -- @param filter: 12.0 标准过滤符 ("HELPFUL", "HARMFUL", "RAID", "PLAYER" 等)
@@ -28,8 +38,9 @@ function AuraScanner:ScanUnit(unit, filter)
     AuraUtil.ForEachAura(unit, filter or "HELPFUL", nil, function(auraData)
         if auraData then
             -- 12.0 秘密值审计与安全提取 [3, 4]
-            -- points 数组在 12.0 战斗中包含动态数值（如吸收量），会被标记为 Secret
-            local safePoints = {}
+            -- 从表池获取临时表
+            local safePoints = GetPointsTable()
+            
             if auraData.points and ns.Security:IsSafe(auraData.points) then
                 for i, val in ipairs(auraData.points) do
                     -- 使用 Security 模块确保即使数值受限，也不会导致 UI 报错
