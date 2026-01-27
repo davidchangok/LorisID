@@ -1,0 +1,46 @@
+## Interface: 120000
+## Title: |TInterface\AddOns\LorisID\icon:16|t LorisID |cFF00FF00[Midnight]|r
+## Title-zhCN: |TInterface\AddOns\LorisID\icon:16|t LorisID |cFF00FF00[至暗之夜]|r
+## Title-zhTW: |TInterface\AddOns\LorisID\icon:16|t LorisID |cFF00FF00[至暗之夜]|r
+## Notes: Advanced Tooltip enhancement. Fully adapted to 12.0 Midnight API.
+## Notes-zhCN: 高级鼠标提示增强。完全适配 12.0 至暗之夜 API。
+## Notes-zhTW: 進階滑鼠提示增強。完全適配 12.0 至暗之夜 API。
+## Author: David W Zhang
+## Version: 3.2.1
+## SavedVariables: LorisIDDB
+## IconAtlas: UI-HUD-MainMenuBar-Icon-AdventureGuide
+## Category: UI Customization
+## Group: LorisID_Suite
+## X-Category: Tooltip
+## X-License: MIT
+
+# ---------------------------------------------------------
+# 1. 核心层: 本地化与基础定义
+# ---------------------------------------------------------
+Localization.lua
+Init.lua
+
+# ---------------------------------------------------------
+# 2. 工具层: 安全审计、缓存与异步加载
+# ---------------------------------------------------------
+Utils\Security.lua
+Utils\Cache.lua
+Utils\AsyncLoader.lua
+
+# ---------------------------------------------------------
+# 3. 功能模块: ID 注入、光环监控与物品查询
+# ---------------------------------------------------------
+Modules\IDDisplay.lua
+Modules\AuraScanner.lua
+Modules\ItemQuery.lua
+Modules\UIComponents.lua
+
+# ---------------------------------------------------------
+# 4. 表现层: Settings API 设置
+# ---------------------------------------------------------
+Settings.lua
+
+# ---------------------------------------------------------
+# 5. 入口层: 生命周期与命令注册
+# ---------------------------------------------------------
+Core.lua
