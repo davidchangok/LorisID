@@ -43,7 +43,8 @@ function IDDisplay:HasLine(tooltip, text)
     for i = 1, numLines do
         -- 修正：获取正确的行文本对象 (e.g., GameTooltipTextLeft1)
         local line = _G[tooltip:GetName() .. "TextLeft" .. i]
-        if line and line:IsShown() and line:GetText() == text then
+        local lineText = line and line:IsShown() and line:GetText()
+        if lineText and Security:IsSafe(lineText) and lineText == text then
             return true
         end
     end

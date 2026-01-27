@@ -79,7 +79,7 @@ function Security:Format(value)
     end
     
     -- 获取 Localization.lua 中的拦截描述
-    local warningText = ns.L or "Action Blocked"
+    local warningText = (ns.L and ns.L["SecretValueBlocked"]) or "Action Blocked"
     return "|cFF".. colorHex.. warningText.. "|r"
 end
 
