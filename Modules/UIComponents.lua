@@ -36,14 +36,14 @@ function UIComponents:ShowMainMenu(owner)
         rootDescription:CreateDivider()
 
         -- 2. 缓存管理子菜单 (还原原插件 Cache 功能)
-        local cacheMenu = rootDescription:CreateButton(ns.L["Cmd_Cache"]) -- 修正：使用正确的键名
-        cacheMenu:CreateButton(ns.L, function() ns.Cache:Clear("item") end)
-        cacheMenu:CreateButton(ns.L, function() ns.Cache:Clear("spell") end)
+        local cacheMenu = rootDescription:CreateButton(ns.L["Performance & Cache"]) -- 修正：使用正确的键名
+        cacheMenu:CreateButton(ns.L["Item"], function() ns.Cache:Clear("item") end)
+        cacheMenu:CreateButton(ns.L["Spell"], function() ns.Cache:Clear("spell") end)
         cacheMenu:CreateButton(ns.L["Clear All"], function() ns.Cache:Clear() end) -- 修正：硬编码中文
 
         -- 3. 调试模式切换
         rootDescription:CreateCheckbox(
-            ns.L, 
+            ns.L["Debug Mode"], 
             function() return ns.DB.debugMode end, 
             function() ns.DB.debugMode = not ns.DB.debugMode end
         )

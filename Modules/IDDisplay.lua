@@ -13,7 +13,7 @@ local IDTypes = ns.IDTypes
 local Security = ns.Security
 
 -- 12.0 核心命名空间
-local TooltipDataProcessor = _G.TooltipDataProcessor
+local TooltipDataProcessor = _G["TooltipDataProcessor"]
 local Enum = _G.Enum
 local C_Item = _G.C_Item
 local C_Spell = _G.C_Spell
@@ -89,7 +89,7 @@ function IDDisplay:AddRelatedIDs(tooltip, mainID, mainType)
     if mainType == IDTypes.ITEM then
         -- 探测图标 (C_Item 返回第 10 位) 
         local info = { C_Item.GetItemInfo(mainID) }
-        if info[3] then self:AddLine(tooltip, info[3], IDTypes.ICON) end
+        if info[10] then self:AddLine(tooltip, info[10], IDTypes.ICON) end
         
         -- 探测物品关联技能
         local _, spellID = C_Item.GetItemSpell(mainID)
@@ -118,6 +118,9 @@ function IDDisplay:ProcessTooltipData(tooltip, data)
     -- 1. 安全拦截：主开关、数据有效性检查 
     if not tooltip or not data or not ns.DB.enabled then return end
     
+    -- [新增] 严格表级安全检查：防止 data 本身是受保护的 Table，访问其字段会导致崩溃
+    if not Security:IsSafe(data) then return end
+
     -- 2. 12.0 秘密值墙：若 ID 本身被系统拦截（如 MBB 按钮），立即跳过防止 UI 闪烁
     if issecretvalue and issecretvalue(data.id) then return end
 

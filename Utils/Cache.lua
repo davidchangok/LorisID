@@ -33,7 +33,7 @@ function Cache:Initialize()
     -- 确保 Init.lua 定义的 ns.IDTypes 已就绪
     local idTypesMap = ns.IDTypes or {}
     for _, idType in pairs(idTypesMap) do
-        self.store = {}
+        self.store[idType] = {}
     end
     
     -- 启动 12.0 标准计时器，定期执行内存回收 [4]
@@ -47,13 +47,13 @@ function Cache:Get(cacheType, key)
     -- 设置项校验：若用户在 Settings.lua 中关闭缓存则返回 nil
     if not ns.DB or not ns.DB.cache or not ns.DB.cache.enabled then return nil end
     
-    local bucket = self.store
+    local bucket = self.store[cacheType]
     if not bucket then return nil end
     
     local entry = bucket[key]
     if entry then
         local now = GetTime()
-        local ttl = CACHE_CONFIG.types or CACHE_CONFIG.defaultTTL
+        local ttl = (CACHE_CONFIG.types and CACHE_CONFIG.types[cacheType]) or CACHE_CONFIG.defaultTTL
         
         -- TTL 判定：检查项是否已过期
         if (now - entry.timestamp) > ttl then
@@ -79,7 +79,7 @@ function Cache:Set(cacheType, key, data)
     -- 12.0 核心防御：禁止缓存受限的秘密值数据，保护 UI 安全 
     if not ns.Security:IsSafe(data) then return end
 
-    local bucket = self.store
+    local bucket = self.store[cacheType]
     if not bucket then return end
 
     -- LRU 淘汰触发：检查容量是否触碰上限
@@ -101,7 +101,7 @@ end
 
 -- [[100% 还原]: LRU (最近最少使用) 算法核心逻辑]
 function Cache:EvictLRU(cacheType)
-    local bucket = self.store
+    local bucket = self.store[cacheType]
     if not bucket then return end
 
     local oldestKey = nil
@@ -125,7 +125,7 @@ end
 function Cache:Cleanup()
     local now = GetTime()
     for cacheType, bucket in pairs(self.store) do
-        local ttl = CACHE_CONFIG.types or CACHE_CONFIG.defaultTTL
+        local ttl = (CACHE_CONFIG.types and CACHE_CONFIG.types[cacheType]) or CACHE_CONFIG.defaultTTL
         for k, entry in pairs(bucket) do
             if (now - entry.timestamp) > ttl then
                 bucket[k] = nil
@@ -138,9 +138,9 @@ end
 -- [[100% 还原]: 清空特定分类或全量缓存数据]
 function Cache:Clear(cacheType)
     if cacheType and self.store then
-        self.store = {}
+        self.store[cacheType] = {}
     else
-        for k in pairs(self.store) do
+        for k in pairs(self.store or {}) do
             self.store[k] = {}
         end
     end

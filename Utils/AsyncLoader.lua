@@ -28,7 +28,7 @@ function AsyncLoader:LoadItem(itemID, callback)
     end
 
     -- 2. 创建 12.0 现代物品对象
-    local itemObj = Item:CreateFromItemID(tonumber(itemID))
+    local itemObj = Item:CreateFromItemID(tonumber(itemID) or 0)
     if itemObj:IsItemEmpty() then return end
 
     -- 3. 注册 12.0 标准回调
@@ -37,17 +37,17 @@ function AsyncLoader:LoadItem(itemID, callback)
         -- [2]name, [3]link, [4]quality, [5]iLevel, [6]icon, [7]bindType, [8]description
         local info = { C_Item.GetItemInfo(itemID) }
         
-        if info[2] then
+        if info[1] then
             local data = {
                 id          = itemID,
-                name        = info[2],
-                link        = info[3],
-                quality     = info[4],
-                level       = info[5],
-                icon        = info[6],
+                name        = info[1],
+                link        = info[2],
+                quality     = info[3],
+                level       = info[4],
+                icon        = info[10], -- 标准 API 图标位于第 10 位
                 bindType    = info[7],
-                description = info[8], -- 12.0 午夜版本新增
-                expansionID = info[9],
+                description = info[9], -- 对齐 ItemQuery.lua 定义 (第9位)
+                expansionID = info[8], -- 对齐 ItemQuery.lua 定义 (第8位)
             }
             
             -- 存入 LRU 缓存并执行回调
@@ -70,7 +70,7 @@ function AsyncLoader:LoadSpell(spellID, callback)
         return
     end
 
-    local spellObj = Spell:CreateFromSpellID(tonumber(spellID))
+    local spellObj = Spell:CreateFromSpellID(tonumber(spellID) or 0)
     
     spellObj:ContinueOnSpellLoad(function()
         -- 适配 11.x/12.x C_Spell.GetSpellInfo 结构化 Table 

@@ -11,6 +11,13 @@ local L = ns.L
 local DB = ns.DB
 local Security = ns.Security
 
+-- [[新增功能]: 12.0 性能分析器接口]
+-- @return number: 返回插件在上一帧的 CPU 耗时 (ms)
+function ns:GetAddOnCPUUsage()
+    -- 12.0 规范：使用 C_AddOns.GetAddOnCPUUsage 获取精确耗时
+    return C_AddOns.GetAddOnCPUUsage(ns.Name)
+end
+
 -- =========================================================
 -- 2. 命令行系统 (Slash Commands)
 -- =========================================================

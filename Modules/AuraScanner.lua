@@ -9,6 +9,7 @@ ns.AuraScanner = AuraScanner
 -- 缓存 12.0 核心 API，优化 12.0 Profiler 性能评分 
 local C_UnitAuras = _G.C_UnitAuras
 local AuraUtil = _G.AuraUtil
+local L = ns.L
 
 -- =========================================================
 -- 2. 核心：单位光环全量扫描引擎
@@ -29,7 +30,7 @@ function AuraScanner:ScanUnit(unit, filter)
             -- 12.0 秘密值审计与安全提取 [3, 4]
             -- points 数组在 12.0 战斗中包含动态数值（如吸收量），会被标记为 Secret
             local safePoints = {}
-            if auraData.points then
+            if auraData.points and ns.Security:IsSafe(auraData.points) then
                 for i, val in ipairs(auraData.points) do
                     -- 使用 Security 模块确保即使数值受限，也不会导致 UI 报错
                     safePoints[i] = ns.Security:IsSafe(val) and val or 0
@@ -37,20 +38,21 @@ function AuraScanner:ScanUnit(unit, filter)
             end
 
             -- 封装结构化数据 (100% 还原原插件字段定义)
+            -- [安全审计] 12.0 战斗中，除 spellId/instanceID 外，几乎所有 auraData 字段都可能被污染
             table.insert(results, {
-                name            = auraData.name,
-                icon            = auraData.icon,
-                count           = auraData.applications or 0,
-                dispelType      = auraData.dispelName,
-                duration        = auraData.duration,
-                expirationTime  = auraData.expirationTime,
-                caster          = auraData.sourceUnit,
+                name            = ns.Security:IsSafe(auraData.name) and auraData.name or L["SecretValueBlocked"],
+                icon            = ns.Security:IsSafe(auraData.icon) and auraData.icon or 0,
+                count           = ns.Security:IsSafe(auraData.applications) and auraData.applications or 0,
+                dispelType      = ns.Security:IsSafe(auraData.dispelName) and auraData.dispelName or "Unknown",
+                duration        = ns.Security:IsSafe(auraData.duration) and auraData.duration or 0,
+                expirationTime  = ns.Security:IsSafe(auraData.expirationTime) and auraData.expirationTime or 0,
+                caster          = ns.Security:IsSafe(auraData.sourceUnit) and auraData.sourceUnit or "Unknown",
                 spellID         = auraData.spellId,
                 -- 12.0 规范：auraInstanceID 是 NeverSecret 的，可以安全用于缓存 Key [5]
                 instanceID      = auraData.auraInstanceID, 
-                isStealable     = auraData.isStealable,
+                isStealable     = ns.Security:IsSafe(auraData.isStealable) and auraData.isStealable or false,
                 points          = safePoints,
-                isFromPlayer    = auraData.isFromPlayerOrPlayerPet,
+                isFromPlayer    = ns.Security:IsSafe(auraData.isFromPlayerOrPlayerPet) and auraData.isFromPlayerOrPlayerPet or false,
             })
         end
         return false -- 继续迭代，直到所有光环扫描完毕
@@ -85,7 +87,7 @@ end
 function AuraScanner:GetAuraValue(unit, spellID, pointIndex, filter)
     local value = 0
     AuraUtil.ForEachAura(unit, filter or "HELPFUL", nil, function(auraData)
-        if auraData and auraData.spellId == spellID and auraData.points then
+        if auraData and auraData.spellId == spellID and auraData.points and ns.Security:IsSafe(auraData.points) then
             -- 12.0 安全审计
             local rawVal = auraData.points[pointIndex or 1]
             if ns.Security:IsSafe(rawVal) then
@@ -108,7 +110,7 @@ function AuraScanner:PrintDebug(unit)
     if buffs then
         print(("|cFF%s[%s]|r ".. L["Scanning Auras"]):format(ns.Colors.Header.hex:sub(3), ns.Name, unit))
         for _, b in ipairs(buffs) do
-            print(("- [%d] %s (层数: %d, 实例ID: %s)"):format(b.spellID, b.name, b.count, tostring(b.instanceID)))
+            print(("- [%d] %s ("..L["Count"]..": %d, "..L["Instance ID"]..": %s)"):format(b.spellID, b.name, b.count, tostring(b.instanceID)))
         end
     end
 end

@@ -13,6 +13,7 @@ local Security = ns.Security
 
 -- 12.0 核心命名空间
 local C_Item = _G.C_Item
+local C_CurrencyInfo = _G.C_CurrencyInfo
 
 -- =========================================================
 -- 2. 核心：物品数据处理与渲染
@@ -109,9 +110,9 @@ function ItemQuery:Audit(itemID)
     local meta = self:GetMetadata(itemID)
     if meta then
         print(("|cFF%s[%s]|r %s:"):format(Colors.Header.hex:sub(3), ns.Name, L["Audit Report"]))
-        print("- 装等:", meta.iLevel)
-        print("- 售价:", GetCoinTextureString(meta.sellPrice)) -- 还原原插件价格显示功能
-        print("- 堆叠:", meta.stackSize)
-        print("- 归属版本:", ns.ExpansionNames or "Unknown")
+        print("- "..L["Item_Level"]..":", meta.iLevel)
+        print("- "..L["Item_Price"]..":", C_CurrencyInfo.GetCoinTextureString(meta.sellPrice)) -- 还原原插件价格显示功能
+        print("- "..L["Stack_Size"]..":", meta.stackSize)
+        print("- "..L["Expansion"]..":", (ns.ExpansionNames and ns.ExpansionNames[meta.expansionID]) or "Unknown")
     end
 end
