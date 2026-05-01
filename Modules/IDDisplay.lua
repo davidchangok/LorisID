@@ -1,4 +1,4 @@
-local addonName, ns =...
+﻿local addonName, ns =...
 
 -- =========================================================
 -- 1. 模块定义 (100% 还原原插件 IDDisplay 核心)
@@ -7,7 +7,7 @@ local IDDisplay = { name = "IDDisplay", enabled = true }
 ns.IDDisplay = IDDisplay
 
 -- 缓存引用，优化 12.0 Profiler 性能
-local L = ns.L
+-- L is accessed dynamically via ns.L in functions below (nil-safe)
 local Colors = ns.Colors
 local IDTypes = ns.IDTypes
 local Security = ns.Security
@@ -20,16 +20,32 @@ local C_Spell = _G.C_Spell
 
 -- 12.0 结构化映射表 (修复：补全枚举索引，解决 unexpected symbol 错误) 
 local TooltipDataTypeMap = {
-    [Enum.TooltipDataType.Item]        = IDTypes.ITEM,
-    [Enum.TooltipDataType.Toy]         = IDTypes.ITEM,
-    [Enum.TooltipDataType.Spell]       = IDTypes.SPELL,
-    [Enum.TooltipDataType.UnitAura]    = IDTypes.SPELL,
-    [Enum.TooltipDataType.Unit]        = IDTypes.UNIT,
-    [Enum.TooltipDataType.Quest]       = IDTypes.QUEST,
-    [Enum.TooltipDataType.Achievement] = IDTypes.ACHIEVEMENT,
-    [Enum.TooltipDataType.Currency]    = IDTypes.CURRENCY,
-    [Enum.TooltipDataType.Mount]       = IDTypes.MOUNT,
-    [Enum.TooltipDataType.EquipmentSet]= IDTypes.EQUIP_SET,
+    [Enum.TooltipDataType.Item]             = IDTypes.ITEM,
+    [Enum.TooltipDataType.Toy]              = IDTypes.ITEM,
+    [Enum.TooltipDataType.Spell]            = IDTypes.SPELL,
+    [Enum.TooltipDataType.UnitAura]         = IDTypes.SPELL,
+    [Enum.TooltipDataType.PetAction]        = IDTypes.SPELL,
+    [Enum.TooltipDataType.Totem]            = IDTypes.SPELL,
+    [Enum.TooltipDataType.AzeriteEssence]   = IDTypes.SPELL,
+    [Enum.TooltipDataType.EnhancedConduit]  = IDTypes.SPELL,
+    [Enum.TooltipDataType.Unit]             = IDTypes.UNIT,
+    [Enum.TooltipDataType.Quest]            = IDTypes.QUEST,
+    [Enum.TooltipDataType.QuestPartyProgress] = IDTypes.QUEST,
+    [Enum.TooltipDataType.Achievement]      = IDTypes.ACHIEVEMENT,
+    [Enum.TooltipDataType.Currency]         = IDTypes.CURRENCY,
+    [Enum.TooltipDataType.Mount]            = IDTypes.MOUNT,
+    [Enum.TooltipDataType.EquipmentSet]     = IDTypes.EQUIP_SET,
+    [Enum.TooltipDataType.CompanionPet]     = IDTypes.COMPANION,
+    [Enum.TooltipDataType.BattlePet]        = IDTypes.BATTLEPET,
+    [Enum.TooltipDataType.Outfit]           = IDTypes.VISUAL,
+    [Enum.TooltipDataType.Object]           = IDTypes.OBJECT,
+    [Enum.TooltipDataType.InstanceLock]     = IDTypes.INSTANCE,
+    [Enum.TooltipDataType.RecipeRankInfo]   = IDTypes.RECIPE,
+    [Enum.TooltipDataType.Macro]           = IDTypes.MACRO,
+    [Enum.TooltipDataType.Corpse]          = IDTypes.UNIT,
+    [Enum.TooltipDataType.PvPBrawl]        = IDTypes.PVP,
+    [Enum.TooltipDataType.MinimapMouseover] = IDTypes.MINIMAP,
+    [Enum.TooltipDataType.Flyout]          = IDTypes.SPELL,
 }
 
 -- =========================================================
@@ -43,9 +59,9 @@ function IDDisplay:HasLine(tooltip, text)
     -- [修复]: 弃用 _G[name.."TextLeft"..i] 旧架构，改用 Region 迭代
     -- 这是 12.0 兼容性最强的方法，支持所有类型的 Tooltip 框架
     for _, region in ipairs({tooltip:GetRegions()}) do
-        if region and region:IsObjectType("FontString") then
+        if region and region.GetObjectType and region:GetObjectType() == "FontString" then
             local lineText = region:GetText()
-            if lineText and Security:IsSafe(lineText) and lineText == text then
+            if lineText and Security:IsSafe(lineText) and lineText:find(text, 1, true) then
                 return true
             end
         end
@@ -57,13 +73,14 @@ end
 function IDDisplay:AddLine(tooltip, id, idType)
     if not tooltip or not id or not idType then return end
     
-    -- 权限检查
-    if not ns.DB.ids then return end
+    -- 权限检查：检查总开关和具体 ID 类型的启用状态
+    if not ns.DB.ids or not ns.DB.ids[idType] then return end
 
     -- 本地化标签解析
     -- 修正：使用 TitleCase (如 "Spell ID") 以匹配 Localization.lua 中的定义
     -- 解决中文环境下显示 "SPELL ID" 的问题
-    local label = L[idType:gsub("^%l", string.upper).. " ID"]
+    local labelKey = idType:gsub("^%l", string.upper).. " ID"
+    local label = (ns.L and ns.L[labelKey]) or labelKey
     
     -- 执行查重
     if self:HasLine(tooltip, label..":") then return end
@@ -118,7 +135,7 @@ end
 
 function IDDisplay:ProcessTooltipData(tooltip, data)
     -- 1. 安全拦截：主开关、数据有效性检查 
-    if not tooltip or not data or not ns.DB.enabled then return end
+    if not tooltip or not data or not ns.DB or not ns.DB.enabled then return end
     
     -- [新增] 严格表级安全检查：防止 data 本身是受保护的 Table，访问其字段会导致崩溃
     if not Security:IsSafe(data) then return end

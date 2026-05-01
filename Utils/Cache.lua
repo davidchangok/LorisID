@@ -36,10 +36,12 @@ function Cache:Initialize()
         self.store[idType] = {}
     end
     
-    -- 启动 12.0 标准计时器，定期执行内存回收 [4]
-    C_Timer.NewTicker(CACHE_CONFIG.cleanupInterval, function()
+    -- 启动 12.0 标准自调度定时器，定期执行内存回收
+    local function ScheduleCleanup()
         self:Cleanup()
-    end)
+        C_Timer.After(CACHE_CONFIG.cleanupInterval, ScheduleCleanup)
+    end
+    C_Timer.After(CACHE_CONFIG.cleanupInterval, ScheduleCleanup)
 end
 
 -- [[100% 还原]: 读取缓存与 TTL 校验]

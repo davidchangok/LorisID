@@ -1,4 +1,4 @@
-## Interface: 120000
+## Interface: 120000, 120001, 120005
 ## Title: |TInterface\AddOns\LorisID\icon:16|t LorisID |cFF00FF00[Midnight]|r
 ## Title-zhCN: |TInterface\AddOns\LorisID\icon:16|t LorisID |cFF00FF00[至暗之夜]|r
 ## Title-zhTW: |TInterface\AddOns\LorisID\icon:16|t LorisID |cFF00FF00[至暗之夜]|r
@@ -6,7 +6,7 @@
 ## Notes-zhCN: 高级鼠标提示增强。完全适配 12.0 至暗之夜 API。
 ## Notes-zhTW: 進階滑鼠提示增強。完全適配 12.0 至暗之夜 API。
 ## Author: David W Zhang
-## Version: 2.0.0
+## Version: 2.3.0
 ## SavedVariables: LorisIDDB
 ## IconAtlas: UI-HUD-MainMenuBar-Icon-AdventureGuide
 ## Category: UI Customization
@@ -17,9 +17,10 @@
 ## X-Curse-Project-ID: 1445941
 
 # ---------------------------------------------------------
-# 1. 核心层: 本地化与基础定义
+# 1. 核心层: 本地化与基础定义 (前5语种)
 # ---------------------------------------------------------
 Localization.lua
+Localization2.lua
 Init.lua
 
 # ---------------------------------------------------------

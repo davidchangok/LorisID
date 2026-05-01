@@ -82,7 +82,7 @@ function AsyncLoader:LoadSpell(spellID, callback)
                 castTime    = spellInfo.castTime,
                 minRange    = spellInfo.minRange,
                 maxRange    = spellInfo.maxRange,
-                description = C_Spell.GetSpellDescription(spellID),
+                description = C_Spell.GetSpellDescription(spellID) or "",
             }
             
             ns.Cache:Set("spell", spellID, data)

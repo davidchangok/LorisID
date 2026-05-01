@@ -16,14 +16,7 @@ local L = ns.L
 -- =========================================================
 
 -- 在函数外部创建表池
-local pointsTablePool = {}
-local function GetPointsTable()
-    return table.remove(pointsTablePool) or {}
-end
-local function ReleasePointsTable(t)
-    table.wipe(t)
-    table.insert(pointsTablePool, t)
-end
+-- 表池已移除：ReleasePointsTable 从未被调用，池永远为空
 
 -- [[100% 还原]: 还原原插件对 Buff/Debuff 的深度扫描逻辑]
 -- @param unit: 单位标识 ("player", "target", "focus" 等)
@@ -39,7 +32,7 @@ function AuraScanner:ScanUnit(unit, filter)
         if auraData then
             -- 12.0 秘密值审计与安全提取 [3, 4]
             -- 从表池获取临时表
-            local safePoints = GetPointsTable()
+            local safePoints = {}
             
             if auraData.points and ns.Security:IsSafe(auraData.points) then
                 for i, val in ipairs(auraData.points) do

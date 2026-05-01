@@ -5,7 +5,7 @@ local addonName, ns =...
 -- =========================================================
 ns.Name = addonName
 -- 12.0 标准 API：获取版本和作者信息
-ns.Version = C_AddOns.GetAddOnMetadata(addonName, "Version") or "3.2.5"
+ns.Version = C_AddOns.GetAddOnMetadata(addonName, "Version") or "2.3.0"
 ns.Author = C_AddOns.GetAddOnMetadata(addonName, "Author") or "David W Zhang"
 
 -- =========================================================
@@ -63,6 +63,16 @@ function ns:InitializeDB()
             ["mount"] = true,
             ["toy"] = true,
             ["talent"] = true,
+            ["set"] = true,
+            ["visual"] = true,
+            ["companion"] = true,
+            ["object"] = true,
+            ["battlepet"] = true,
+            ["instance"] = true,
+            ["recipe"] = true,
+            ["macro"] = true,
+            ["pvp"] = true,
+            ["minimap"] = true,
             ["icon"] = true,
         }
     }
@@ -72,7 +82,7 @@ function ns:InitializeDB()
     for k, v in pairs(defaults) do
         if LorisIDDB[k] == nil then
             LorisIDDB[k] = v
-        elseif type(v) == "table" then
+        elseif type(v) == "table" and type(LorisIDDB[k]) == "table" then
             for subK, subV in pairs(v) do
                 if LorisIDDB[k][subK] == nil then
                     LorisIDDB[k][subK] = subV
@@ -108,5 +118,7 @@ ns.IDTypes = {
     ITEM = "item", SPELL = "spell", UNIT = "unit", QUEST = "quest",
     ACHIEVEMENT = "achievement", CURRENCY = "currency", MOUNT = "mount",
     TOY = "toy", ICON = "icon", TALENT = "talent", EQUIP_SET = "set",
-    VISUAL = "visual",
+    VISUAL = "visual", COMPANION = "companion", OBJECT = "object",
+    BATTLEPET = "battlepet", INSTANCE = "instance", RECIPE = "recipe",
+    MACRO = "macro", PVP = "pvp", MINIMAP = "minimap",
 }

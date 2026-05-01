@@ -97,12 +97,17 @@ Core:RegisterEvent("QUEST_DATA_LOAD_RESULT")
 Core:SetScript("OnEvent", function(self, event,...)
     if event == "PLAYER_LOGIN" then
         -- 启动日志 (数据库已在 ADDON_LOADED 事件中初始化)
+        -- 12.0 沙盒自检：确保底层安全函数已注册
+        if not Security:IsSafe(123) then
+            print("|cFFFF0000[LorisID]|r 安全审计引擎异常，请检查 12.0 API 环境。")
+        end
+
         if ns.DB and ns.DB.debugMode then
             print(("|cFF%s[%s]|r: %s"):format(ns.Colors.Header.hex:sub(3), ns.Name, L["Engine Started"]))
         end
-        
-        -- 启动 12.0 实时性能监控
-        C_Timer.NewTicker(5, function()
+
+        -- 启动 12.0 实时性能监控 (使用 C_Timer.After 自调度模式)
+        local function PerfCheck()
             if ns.DB and ns.DB.debugMode then
                 local cpu = ns:GetAddOnCPUUsage()
                 if cpu and cpu > (ns.DB.perfThreshold or 10) then
@@ -111,7 +116,9 @@ Core:SetScript("OnEvent", function(self, event,...)
                     ))
                 end
             end
-        end)
+            C_Timer.After(5, PerfCheck)
+        end
+        C_Timer.After(5, PerfCheck)
 
     elseif event == "PLAYER_REGEN_DISABLED" then
         self:HandleCombatState(true)

@@ -85,9 +85,4 @@ function Security:Format(value)
     return cachedWarningFormat
 end
 
--- 12.0 沙盒自检：确保底层安全函数已注册
-if ns.DB and ns.DB.debugMode then
-    if not Security:IsSafe(123) then
-        print("|cFFFF0000LorisID: 安全审计引擎异常，请检查 12.0 API 环境。|r")
-    end
-end
+-- 12.0 沙盒自检已移至 Core.lua PLAYER_LOGIN 事件中执行
