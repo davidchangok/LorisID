@@ -114,7 +114,7 @@ local function CreateSettingsPanel()
     scrollFrame:SetPoint("BOTTOMRIGHT", -30, 10)
 
     local content = CreateFrame("Frame", nil, scrollFrame)
-    content:SetSize(610, 520)
+    content:SetSize(610, 560)
     scrollFrame:SetScrollChild(content)
 
     -- 3. 构建所有 UI 内容 (挂载到 scrollChild content 上)
@@ -138,11 +138,11 @@ local function CreateSettingsPanel()
     cbDebug:SetPoint("TOPLEFT", 15, -50)
 
     -- GroupBox 2: ID Display Settings - 三列布局
-    local groupID = CreateGroupBox(content, L["ID Display Settings"], 240)
+    local groupID = CreateGroupBox(content, L["ID Display Settings"], 270)
     groupID:SetPoint("TOPLEFT", content, "TOPLEFT", 5, yOffset)
-    yOffset = yOffset - 250
+    yOffset = yOffset - 280
 
-    local col1 = { "item", "spell", "unit", "quest", "achievement", "set", "pvp" }
+    local col1 = { "item", "spell", "petspell", "unit", "quest", "achievement", "set", "pvp" }
     for i, key in ipairs(col1) do
         local labelKey = key:sub(1,1):upper() .. key:sub(2)
         local cb = CreateCheckButton(groupID, L[labelKey],

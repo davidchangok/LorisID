@@ -56,6 +56,7 @@ function ns:InitializeDB()
         ids = {
             ["item"] = true,
             ["spell"] = true,
+            ["petspell"] = true,
             ["unit"] = true,
             ["quest"] = true,
             ["achievement"] = true,
@@ -115,10 +116,10 @@ end)
 
 -- 支持的 ID 类型映射 (对应原插件 IDTypes)
 ns.IDTypes = {
-    ITEM = "item", SPELL = "spell", UNIT = "unit", QUEST = "quest",
-    ACHIEVEMENT = "achievement", CURRENCY = "currency", MOUNT = "mount",
-    TOY = "toy", ICON = "icon", TALENT = "talent", EQUIP_SET = "set",
-    VISUAL = "visual", COMPANION = "companion", OBJECT = "object",
-    BATTLEPET = "battlepet", INSTANCE = "instance", RECIPE = "recipe",
-    MACRO = "macro", PVP = "pvp", MINIMAP = "minimap",
+    ITEM = "item", SPELL = "spell", PETSPELL = "petspell", UNIT = "unit",
+    QUEST = "quest", ACHIEVEMENT = "achievement", CURRENCY = "currency",
+    MOUNT = "mount", TOY = "toy", ICON = "icon", TALENT = "talent",
+    EQUIP_SET = "set", VISUAL = "visual", COMPANION = "companion",
+    OBJECT = "object", BATTLEPET = "battlepet", INSTANCE = "instance",
+    RECIPE = "recipe", MACRO = "macro", PVP = "pvp", MINIMAP = "minimap",
 }

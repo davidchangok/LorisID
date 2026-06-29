@@ -24,7 +24,7 @@ local TooltipDataTypeMap = {
     [Enum.TooltipDataType.Toy]              = IDTypes.ITEM,
     [Enum.TooltipDataType.Spell]            = IDTypes.SPELL,
     [Enum.TooltipDataType.UnitAura]         = IDTypes.SPELL,
-    [Enum.TooltipDataType.PetAction]        = IDTypes.SPELL,
+    [Enum.TooltipDataType.PetAction]        = IDTypes.PETSPELL,
     [Enum.TooltipDataType.Totem]            = IDTypes.SPELL,
     [Enum.TooltipDataType.AzeriteEssence]   = IDTypes.SPELL,
     [Enum.TooltipDataType.EnhancedConduit]  = IDTypes.SPELL,
@@ -114,8 +114,8 @@ function IDDisplay:AddRelatedIDs(tooltip, mainID, mainType)
         local _, spellID = C_Item.GetItemSpell(mainID)
         if spellID then self:AddLine(tooltip, spellID, IDTypes.SPELL) end
         
-    elseif mainType == IDTypes.SPELL then
-        -- 12.0 规范：从结构化 Table 提取图标 
+    elseif mainType == IDTypes.SPELL or mainType == IDTypes.PETSPELL then
+        -- 12.0 规范：从结构化 Table 提取图标
         local spellInfo = C_Spell.GetSpellInfo(mainID)
         if spellInfo and spellInfo.iconID then
             self:AddLine(tooltip, spellInfo.iconID, IDTypes.ICON)
