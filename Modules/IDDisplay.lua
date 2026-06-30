@@ -201,8 +201,9 @@ end
 -- [[后备 1]: GameTooltip OnTooltipSetItem — 物品 tooltip 完成后的最后回调]
 function IDDisplay:RegisterTooltipScriptHooks()
     -- GameTooltip: 主要 tooltip 框架
+    -- 注意: 12.0 中 OnTooltipSetItem/OnTooltipSetSpell 脚本可能不存在，用 pcall 保护
     if GameTooltip then
-        GameTooltip:HookScript("OnTooltipSetItem", function(tooltip)
+        pcall(GameTooltip.HookScript, GameTooltip, "OnTooltipSetItem", function(tooltip)
             if not ShouldInject() then return end
             -- 安全提取物品 ID (Dragonflight 10.0+ API)
             local ok, id = pcall(tooltip.GetItem, tooltip)
@@ -212,7 +213,7 @@ function IDDisplay:RegisterTooltipScriptHooks()
             end
         end)
 
-        GameTooltip:HookScript("OnTooltipSetSpell", function(tooltip)
+        pcall(GameTooltip.HookScript, GameTooltip, "OnTooltipSetSpell", function(tooltip)
             if not ShouldInject() then return end
             local ok, id = pcall(tooltip.GetSpell, tooltip)
             if ok and type(id) == "number" and id > 0 then
@@ -223,8 +224,9 @@ function IDDisplay:RegisterTooltipScriptHooks()
     end
 
     -- ItemRefTooltip: 聊天链接等场景的 tooltip
+    -- 注意: 12.0 中 OnTooltipSetItem/OnTooltipSetSpell 脚本可能不存在，用 pcall 保护
     if ItemRefTooltip then
-        ItemRefTooltip:HookScript("OnTooltipSetItem", function(tooltip)
+        pcall(ItemRefTooltip.HookScript, ItemRefTooltip, "OnTooltipSetItem", function(tooltip)
             if not ShouldInject() then return end
             local ok, id = pcall(tooltip.GetItem, tooltip)
             if ok and type(id) == "number" and id > 0 then
@@ -233,7 +235,7 @@ function IDDisplay:RegisterTooltipScriptHooks()
             end
         end)
 
-        ItemRefTooltip:HookScript("OnTooltipSetSpell", function(tooltip)
+        pcall(ItemRefTooltip.HookScript, ItemRefTooltip, "OnTooltipSetSpell", function(tooltip)
             if not ShouldInject() then return end
             local ok, id = pcall(tooltip.GetSpell, tooltip)
             if ok and type(id) == "number" and id > 0 then
