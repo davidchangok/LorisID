@@ -198,53 +198,8 @@ local function ParseHyperlink(link)
     return id, typeMap[linkType:lower()]
 end
 
--- [[后备 1]: GameTooltip OnTooltipSetItem — 物品 tooltip 完成后的最后回调]
-function IDDisplay:RegisterTooltipScriptHooks()
-    -- GameTooltip: 主要 tooltip 框架
-    -- 注意: 12.0 中 OnTooltipSetItem/OnTooltipSetSpell 脚本可能不存在，用 pcall 保护
-    if GameTooltip then
-        pcall(GameTooltip.HookScript, GameTooltip, "OnTooltipSetItem", function(tooltip)
-            if not ShouldInject() then return end
-            -- 安全提取物品 ID (Dragonflight 10.0+ API)
-            local ok, id = pcall(tooltip.GetItem, tooltip)
-            if ok and type(id) == "number" and id > 0 then
-                self:AddLine(tooltip, id, IDTypes.ITEM)
-                self:AddRelatedIDs(tooltip, id, IDTypes.ITEM)
-            end
-        end)
-
-        pcall(GameTooltip.HookScript, GameTooltip, "OnTooltipSetSpell", function(tooltip)
-            if not ShouldInject() then return end
-            local ok, id = pcall(tooltip.GetSpell, tooltip)
-            if ok and type(id) == "number" and id > 0 then
-                self:AddLine(tooltip, id, IDTypes.SPELL)
-                self:AddRelatedIDs(tooltip, id, IDTypes.SPELL)
-            end
-        end)
-    end
-
-    -- ItemRefTooltip: 聊天链接等场景的 tooltip
-    -- 注意: 12.0 中 OnTooltipSetItem/OnTooltipSetSpell 脚本可能不存在，用 pcall 保护
-    if ItemRefTooltip then
-        pcall(ItemRefTooltip.HookScript, ItemRefTooltip, "OnTooltipSetItem", function(tooltip)
-            if not ShouldInject() then return end
-            local ok, id = pcall(tooltip.GetItem, tooltip)
-            if ok and type(id) == "number" and id > 0 then
-                self:AddLine(tooltip, id, IDTypes.ITEM)
-                self:AddRelatedIDs(tooltip, id, IDTypes.ITEM)
-            end
-        end)
-
-        pcall(ItemRefTooltip.HookScript, ItemRefTooltip, "OnTooltipSetSpell", function(tooltip)
-            if not ShouldInject() then return end
-            local ok, id = pcall(tooltip.GetSpell, tooltip)
-            if ok and type(id) == "number" and id > 0 then
-                self:AddLine(tooltip, id, IDTypes.SPELL)
-                self:AddRelatedIDs(tooltip, id, IDTypes.SPELL)
-            end
-        end)
-    end
-end
+-- 注意: 12.0 中 GameTooltip/ItemRefTooltip 不再暴露 OnTooltipSetItem/OnTooltipSetSpell 脚本，
+-- RegisterTooltipScriptHooks 函数已移除。主路径为 TooltipDataProcessor.AddTooltipPostCall，后备为 hooksecurefunc。
 
 -- [[后备 2]: hooksecurefunc 底层拦截 — 最高权重，延迟一帧注入
 -- 某些第三方插件会完全绕过 TooltipDataProcessor 和原生脚本流程
@@ -298,9 +253,8 @@ function IDDisplay:RegisterSecureFuncHooks()
     end
 end
 
--- [[统一注册]: 一次性注册所有高权重后备钩子]
+-- [[后备钩子]: hooksecurefunc 底层拦截 — 解决某些第三方插件界面中不显示的问题
 function IDDisplay:RegisterHeavyHooks()
-    self:RegisterTooltipScriptHooks()
     self:RegisterSecureFuncHooks()
 end
 
